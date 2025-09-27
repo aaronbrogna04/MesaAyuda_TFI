@@ -64,7 +64,7 @@ formE1.addEventListener('submit', (event) => {
 /*-----
     Define el URI para realizar el acceso en base al acceso a un servidor local
 */
-    const MODE='AWS'; /*-- Instrucción a cambiar opciones LOCAL, TYPICODE o AWS --*/
+    const MODE='LOCAL'; /*-- Instrucción a cambiar opciones LOCAL, TYPICODE o AWS --*/
 
 	if (MODE == 'LOCAL') {
 	/*-----
@@ -74,13 +74,17 @@ formE1.addEventListener('submit', (event) => {
 	        id: data.id,
 		    password: data.password
 		}	
-    	const options = {
-			method: 'GET',
+
+		const options = {
+			method: 'POST',
 			headers: {
-			'Content-Type': 'application/json',
+				'Content-Type': 'application/json',
 			},
-			//body: JSON.stringify(login),
-		};
+			body: JSON.stringify(login),
+	};
+
+
+
 	 	console.log('API REST:' + RESTAPI.loginCliente);
 	    console.log(login);
 	    console.log('login(' + JSON.stringify(login) + ')');

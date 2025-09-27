@@ -44,7 +44,7 @@ const input = { // ScanInput
     
     //*---- Hace el unmarshalling de los datos pues NO es un objeto DynamoDBDocumentClient y por lo tanto el resultado es un JSON que 
     
-    const uresponse=response.Items.map(i=>unmarshall(i));
+    const data=response.Items.map(i=>unmarshall(i));
     
     //*---- Si anda bien retorna
     
@@ -54,7 +54,7 @@ return {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({"clienteID": scanKey,
-                              uresponse
+                              data
         })
         
 }}

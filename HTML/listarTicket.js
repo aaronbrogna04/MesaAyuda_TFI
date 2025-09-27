@@ -53,24 +53,35 @@ AWS
 */
 
 const HTMLResponse=document.querySelector("#app");
-const clienteID=query.id;
-const ticket = {
-    "ID" : clienteID,
+var ticket = {
+    "ID" : query.id,
 };
     
-const options = {
+var options = {
     method: 'GET',
-//    headers: {
-//    'Content-Type': 'application/json',
-//    },
-    //body: JSON.stringify(ticket),
     };
 var APIREST_URL='';
+console.log('transferred mode:'+query.mode);    
+
 switch (query.mode) {
   case "LOCAL":
     console.log("Utiliza servidor NodeJS local.");
-    console.log("API_listarTicket:"+RESTAPI.listarTicket);    
-    APIREST_URL=RESTAPI.listarTicket+'?ID='+query.id;
+    console.log("API_listarTicket:"+RESTAPI.listarTicket); 
+  
+    ticket = {
+       "ID" : query.id,
+    };
+    
+    options = {
+       method: 'POST',
+       headers: {
+       'Content-Type': 'application/json',
+    },
+        body: JSON.stringify(ticket),
+    };
+    console.log("ticket:"+JSON.stringify(ticket)+" options:"+JSON.stringify(options));
+
+    APIREST_URL=RESTAPI.listarTicket;
     break;
   case "TYPICODE":
     console.log("Utiliza TypiCode como fake REST API!");
@@ -100,8 +111,8 @@ fetch(`${APIREST_URL}`,options)
     let table=document.createElement("table");
     table.style.border="1px solid";
     table.style.backgroundColor="##626607";
-
-    ticket.uresponse.forEach((t)=> { 
+//ticket.uresponse.forEach((t)=> { 
+    ticket.data.forEach((t)=> { 
         console.log(t.clienteID)
         if (t.clienteID == query.id) {
             if (f==false) {
