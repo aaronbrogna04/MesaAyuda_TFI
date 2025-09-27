@@ -64,7 +64,7 @@ formE1.addEventListener('submit', (event) => {
 /*-----
     Define el URI para realizar el acceso en base al acceso a un servidor local
 */
-    const MODE='LOCAL'; /*-- Instrucción a cambiar opciones LOCAL, TYPICODE o AWS --*/
+    const MODE='TYPICODE'; /*-- Instrucción a cambiar opciones LOCAL, TYPICODE o AWS --*/
 
 	if (MODE == 'LOCAL') {
 	/*-----

@@ -84,8 +84,8 @@ switch (query.mode) {
     APIREST_URL=RESTAPI.listarTicket;
     break;
   case "TYPICODE":
-    console.log("Utiliza TypiCode como fake REST API!");
-    APIREST_URL='http://my-json-server.typicode.com/lu7did/testJASON/ticket/';
+    console.log("Typicode no soportado en ésta función");
+    APIREST_URL='';
     break;
   case "AWS": // Múltiples casos para la misma acción
     console.log("Utiliza AWS como serverless");
