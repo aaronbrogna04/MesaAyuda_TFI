@@ -104,5 +104,16 @@ return {
     headers: {
       "Content-Type": "application/json"
     },
-    body : JSON.stringify({"response":"OK", uresponse}),
+    body : JSON.stringify({"response":"OK",
+      "nombre": uresponse.nombre,
+      "contacto": uresponse.contacto,
+      "password": uresponse.password,
+      "fecha_ultimo_ingreso": uresponse.fecha_ultimo_ingreso,
+      "activo": uresponse.activo,
+      "fecha_cambio_password": uresponse.fecha_cambio_password,
+      "registrado": uresponse.registrado,
+      "primer_ingreso": uresponse.primer_ingreso,
+      "fecha_alta": uresponse.fecha_alta,
+      "id": uresponse.id}),
+      
 }};                                               

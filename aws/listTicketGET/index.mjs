@@ -53,6 +53,9 @@ return {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({"clienteID": scanKey,uresponse})
-        }
-}
+        body: JSON.stringify({"clienteID": scanKey,
+                              uresponse
+        })
+        
+}}
+

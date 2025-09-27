@@ -27,82 +27,81 @@ console.log("id:"+query.id);
 console.log("contacto:"+query.contacto);
 console.log("nombre:"+query.nombre);
 console.log("ultima_fecha:"+query.fecha_ultimo_ingreso);
+console.log("mode:"+query.mode);
 
 document.getElementById("lastlogin").innerHTML = "<table><tr><td>Cliente</td><td>"+query.id+"</td></tr><tr><td>Contacto</td><td>"+query.contacto+"</td></tr></tr><tr><td>Nombre</td><td>"+query.nombre+"</td></tr><tr><td>Ultimo ingreso</td><td>"+query.fecha_ultimo_ingreso+"</td></tr></table>";
 
 
-/*---
-Accede a REST API para obtener tickets
-Tener en cuenta que typicode es un fake REST API
-*/
-
-//const APIREST_URL='http://my-json-server.typicode.com/lu7did/testJASON/ticket/';
-// URL para acceder directamente a ésta función
-//http://127.0.0.1:5500/listarTicket.html?id=0533a95d-7eef-4c6b-b753-1a41c9d1fbd0&nombre=Pedro%20E.%20Colla&ultimo=01/11/2023
-//
-
-//const APIREST_URL='https://xe3qolsgh0.execute-api.us-east-1.amazonaws.com/listarTicketGET?clienteID='+query.id;
-//clientID 0533a95d-7eef-4c6b-b753-1a41c9d1fbd0
-
-
-
-
-//const api_TicketURL=APIREST_URL;
-
-//fetch(`${api_TicketURL}`)
-
-const HTMLResponse=document.querySelector("#app");
 const systemURL={ 
 
     listarTicket    : "http://127.0.0.1:5500/HTML/listarTicket.html",
-    addTicket       : "http://127.0.0.1:5500/HTML/addTicket.html",
-    updateTicket    : "http://127.0.0.1:5500/HTML/updateTicket.html",
     loginCliente    : "http://127.0.0.1:5500/HTML/loginClient.html",
-    updateCliente   : "http://127.0.0.1:5500/HTML/updateCliente.html",
-    addCliente      : "http://127.0.0.1:5500/HTML/addCliente.html",
-    resetCliente    : "http://127.0.0.1:5500/resetCliente.html"
 
 };
 
 const RESTAPI={
     loginCliente    : "http://127.0.0.1:8080/api/loginCliente",
     listarTicket    : "http://localhost:8080/api/listarTicket",
-    addCliente      : "http://localhost:8080/api/addCliente",
-    getTicket       : "http://localhost:8080/api/getTicket",
-    updateTicket    : "http://localhost:8080/api/updateTicket",
-    getCliente      : "http://localhost:8080/api/getCliente",
-    updateCliente   : "http://localhost:8080/api/updateCliente"
 };
 
-const clienteID=query.id;
+/*---
+Define que REST API server utilizará para obtener datos, el modo lo recibe como argumento
+LOCAL 
+TYPICODE
+AWS 
 
+*/
+
+const HTMLResponse=document.querySelector("#app");
+const clienteID=query.id;
 const ticket = {
-    "clienteID" : clienteID,
+    "ID" : clienteID,
 };
     
 const options = {
-    method: 'POST',
-    headers: {
-    'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(ticket),
+    method: 'GET',
+//    headers: {
+//    'Content-Type': 'application/json',
+//    },
+    //body: JSON.stringify(ticket),
     };
-
-console.log("API_listarTicket:"+RESTAPI.listarTicket);    
+var APIREST_URL='';
+switch (query.mode) {
+  case "LOCAL":
+    console.log("Utiliza servidor NodeJS local.");
+    console.log("API_listarTicket:"+RESTAPI.listarTicket);    
+    APIREST_URL=RESTAPI.listarTicket+'?ID='+query.id;
+    break;
+  case "TYPICODE":
+    console.log("Utiliza TypiCode como fake REST API!");
+    APIREST_URL='http://my-json-server.typicode.com/lu7did/testJASON/ticket/';
+    break;
+  case "AWS": // Múltiples casos para la misma acción
+    console.log("Utiliza AWS como serverless");
+    APIREST_URL='https://n3ttz410ze.execute-api.us-east-1.amazonaws.com/default/listTicketGET?ID='+query.id;
+    //clientID 803a62c8-78c8-4b63-9106-73af216d504b
+    break;
+  default: // Si no coincide con ninguno de los casos anteriores
+    console.log("Asume AWS.");
+    APIREST_URL='https://n3ttz410ze.execute-api.us-east-1.amazonaws.com/default/listTicketGET?ID='+query.id;
+}
+console.log("APIREST_URL:"+APIREST_URL);
 console.log("ticket  :"+JSON.stringify(ticket));
 console.log("options :"+JSON.stringify(options));
 
 
-fetch(`${RESTAPI.listarTicket}`,options)
+fetch(`${APIREST_URL}`,options)
 .then(res => {
     return res.json();
 }).then(ticket=>{
+    console.log("ticket:");
     console.log(ticket);
     let f=false;
     let table=document.createElement("table");
     table.style.border="1px solid";
     table.style.backgroundColor="##626607";
-    ticket.data.forEach((t)=> {
+
+    ticket.uresponse.forEach((t)=> { 
         console.log(t.clienteID)
         if (t.clienteID == query.id) {
             if (f==false) {
@@ -121,6 +120,7 @@ fetch(`${RESTAPI.listarTicket}`,options)
             }
 
             const body=[t.clienteID,`${t.id}`,`${t.solucion}`,`${t.estado_solucion}`,`${t.ultimo_contacto}`];
+            
             let trl=document.createElement("tr");
             body.forEach((line) => {
                 let td=document.createElement("td");

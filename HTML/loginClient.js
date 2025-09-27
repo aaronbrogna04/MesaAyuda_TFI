@@ -53,51 +53,43 @@ formE1.addEventListener('submit', (event) => {
 
 	const systemURL = {
 		listarTicket: 'http://127.0.0.1:5500/HTML/listarTicket.html',
-		addTicket: 'http://127.0.0.1:5500/HTML/addTicket.html',
-		updateTicket: 'http://127.0.0.1:5500/HTML/updateTicket.html',
 		loginCliente: 'http://127.0.0.1:5500/HTML/loginClient.html',
-		updateCliente: 'http://127.0.0.1:5500/HTML/updateCliente.html',
-		addCliente: 'http://127.0.0.1:5500/HTML/addCliente.html',
-		resetCliente: 'http://127.0.0.1:5500/HTML/resetCliente.html',
 	};
 
 	const RESTAPI = {
 		loginCliente: 'http://localhost:8080/api/loginCliente',
 		listarTicket: 'http://localhost:8080/api/listarTicket',
-		addCliente: 'http://localhost:8080/api/addCliente',
-		getTicket: 'http://localhost:8080/api/getTicket',
-		updateTicket: 'http://localhost:8080/api/updateTicket',
-		getCliente: 'http://localhost:8080/api/getCliente',
-		updateCliente: 'http://localhost:8080/api/updateCliente',
 	};
 
+/*-----
+    Define el URI para realizar el acceso en base al acceso a un servidor local
+*/
+    const MODE='AWS'; /*-- Instrucción a cambiar opciones LOCAL, TYPICODE o AWS --*/
+
+	if (MODE == 'LOCAL') {
 	/*-----
         Crea estructuras para acceder a data del cliente
         */
-	const login = {
-		id: data.id,
-		password: data.password,
-	};
-
-	const options = {
-		method: 'POST',
-		headers: {
+	    const login = {
+	        id: data.id,
+		    password: data.password
+		}	
+    	const options = {
+			method: 'GET',
+			headers: {
 			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(login),
+			},
+			//body: JSON.stringify(login),
+		};
+	 	console.log('API REST:' + RESTAPI.loginCliente);
+	    console.log(login);
+	    console.log('login(' + JSON.stringify(login) + ')');
+	    console.log('options ' + JSON.stringify(options));
+    	var API = RESTAPI.loginCliente;
+	    var APIoptions = options;
+
 	};
 
-	console.log('API REST:' + RESTAPI.loginCliente);
-	console.log(login);
-	console.log('login(' + JSON.stringify(login) + ')');
-	console.log('options ' + JSON.stringify(options));
-
-	/*-----
-        Define el URI para realizar el acceso
-        */
-
-	var API = RESTAPI.loginCliente;
-	var APIoptions = options;
 
 	/*----------------------------------------------------------------------*/
 	/*---- Typicode utilizar id 803a62c8-78c8-4b63-9106-73af216d504b -------*/
@@ -109,18 +101,30 @@ formE1.addEventListener('submit', (event) => {
 	/*              const tipycode=false;                                   */
 	/*----------------------------------------------------------------------*/
 
-	const tipycode = true; /*-- Instrucción a cambiar --*/
 
-	if (tipycode == true) {
+	if (MODE == 'TYPICODE') {
 		console.log('Acceso usando Typicode como application server');
 		API =
 			'https://my-json-server.typicode.com/lu7did/MesaAyuda/posts/' + data.id;
 		APIoptions = { method: 'GET' };
 	}
 
+	/*----------------------------------------------------------------------*/
+	/*---- AWS Accede con URL de Lambda loginUserGET                 -------*/
+	/*                                                                      */
+	/* cliente: 803a62c8-78c8-4b63-9106-73af216d504b                        */
+	/*                                                                      */
+	/* Para activar el acceso mediante AWS hacer const aws=true;            */
+	/*----------------------------------------------------------------------*/
+	if (MODE == 'AWS') {
+		console.log('Acceso usando AWS lambda como application server');
+		API='https://fmtj0jrpp9.execute-api.us-east-1.amazonaws.com/default/loginUserGET?ID=' + data.id + '&PASSWORD=' + data.password;
+    	APIoptions = { method: 'GET' };
+	}
 	/*-----
-        Realiza el acceso al API Rest utilizando gestión de sincronización mediante promesas
-        */
+    Realiza el acceso al API Rest utilizando gestión de sincronización mediante promesas
+	utiliza URL y options definidos en los pasos anteriores
+    */
 
 	fetch(`${API}`, APIoptions)
 		.then((res) => {
@@ -128,7 +132,7 @@ formE1.addEventListener('submit', (event) => {
 		})
 		.then((users) => {
 			console.log(
-				'Datos enviados por NodeJS local server=' + JSON.stringify(users)
+				'Datos en respuesta del application server=' + JSON.stringify(users)
 			);
 			console.log('users.response=' + users.password);
 			if (users.response == 'OK') {
@@ -139,14 +143,9 @@ formE1.addEventListener('submit', (event) => {
 						users.nombre +
 						') fecha_ultimo_ingreso(' +
 						users.fecha_ultimo_ingreso +
-						')'
+						')' +
+						'mode(' + MODE + ')'
 				);
-				document.getElementById('resultado').style.color = 'BLACK';
-				document.getElementById('resultado').textContent =
-					'Bienvenido al sistema ' +
-					users.nombre +
-					', ultimo ingreso ' +
-					users.fecha_ultimo_ingreso;
 				console.log(
 					'id=' +
 						users.id +
@@ -165,7 +164,8 @@ formE1.addEventListener('submit', (event) => {
 						'&nombre=' +
 						users.nombre +
 						'&fecha_ultimo_ingreso=' +
-						users.fecha_ultimo_ingreso
+						users.fecha_ultimo_ingreso +
+						'&mode=' + MODE
 				);
 				window.location.href =
 					systemURL.listarTicket +
@@ -176,7 +176,8 @@ formE1.addEventListener('submit', (event) => {
 					'&nombre=' +
 					users.nombre +
 					'&fecha_ultimo_ingreso=' +
-					users.fecha_ultimo_ingreso;
+					users.fecha_ultimo_ingreso +
+					'&mode=' + MODE;
 			} else {
 				console.log('La password no es correcta');
 				document.getElementById('resultado').style.color = 'RED';
