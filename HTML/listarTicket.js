@@ -85,7 +85,7 @@ switch (query.mode) {
     break;
   case "TYPICODE":
     console.log("Typicode no soportado en ésta función");
-    APIREST_URL='';
+    APIREST_URL='https://my-json-server.typicode.com/lu7did/mesaayuda/posts/'+query.id;
     break;
   case "AWS": // Múltiples casos para la misma acción
     console.log("Utiliza AWS como serverless");
