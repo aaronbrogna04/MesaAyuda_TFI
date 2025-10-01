@@ -15,7 +15,7 @@ formE1.addEventListener('submit', (event) => {
         Realiza validaciones en los datos del formulario antes de procesar
         */
 
-	if (data.username == '' || data.password == '') {
+	if (data.id == '' || data.password == '') {
 		console.log('debe indicar usuario');
 		document.getElementById('resultado1').style.color = 'RED';
 		document.getElementById('resultado1').style.textAlign = 'center';
@@ -24,7 +24,7 @@ formE1.addEventListener('submit', (event) => {
 		return;
 	}
 
-	if (data.username == 'pec') {
+	if (data.id == 'pec') {   /*--Fix hecho por  Germán Lombardi IS1-2025 */
 		console.log('pec no es bienvenido en éste sistema');
 		const m = '<li>El usuario <pec> no es bienvenido en éste sistema</li>';
 		document.getElementById('resultado2').style.color = 'RED';
@@ -64,7 +64,7 @@ formE1.addEventListener('submit', (event) => {
 /*-----
     Define el URI para realizar el acceso en base al acceso a un servidor local
 */
-    const MODE='AWS'; /*-- Instrucción a cambiar opciones LOCAL, TYPICODE o AWS --*/
+    const MODE='LOCAL'; /*-- Instrucción a cambiar opciones LOCAL, TYPICODE o AWS --*/
 
 	if (MODE == 'LOCAL') {
 	/*-----
@@ -184,9 +184,9 @@ formE1.addEventListener('submit', (event) => {
 					'&mode=' + MODE;
 			} else {
 				console.log('La password no es correcta');
-				document.getElementById('resultado').style.color = 'RED';
-				document.getElementById('resultado').textContent =
-					'Error de login, intente nuevamente';
+				document.getElementById('resultado1').style.color = 'RED'; /*--Fix hecho por  Germán Lombardi IS1-2025 */
+				document.getElementById('resultado1').textContent =
+					'Error de login, intente nuevamente';                  /*--Fix hecho por  Germán Lombardi IS1-2025 */
 			}
 		});
 });
