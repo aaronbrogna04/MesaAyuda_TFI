@@ -99,57 +99,53 @@ app.get('/api/cliente', (req,res) => {
   /api/loginCliente
   Esta API permite acceder a un cliente por ID y comparar la password pasada en un JSON en el cuerpo con la indicada en el DB
 */  
-app.post('/api/loginCliente', (req,res) => {
+app.post('/api/loginCliente', async (req, res) => {
 
-    const { id } = req.body;
-    const {password} = req.body;
+    const { contacto, password } = req.body;
 
-    console.log("loginCliente: id("+id+") password ("+password+")");
+    console.log("loginCliente: contacto("+contacto+") password ("+password+")");
 
     if (!password) {
         res.status(400).send({response : "ERROR" , message : "Password no informada"});
         return;
     }    
-    if (!id) {
-        res.status(400).send({response : "ERROR" , message : "id no informado"});
+    if (!contacto) {
+        res.status(400).send({response : "ERROR" , message : "Contacto no informado"});
         return;
     }    
 
-    let getClienteByKey = function () {
-        var params = {
-            TableName: "cliente",
-            Key: {
-                "id" : id
+    try{
+        const clientes = await scanDb (contacto)
+
+        //Verifica si no hay ningun cliente con ese correo
+        if (!clientes || clientes.length === 0){
+            res.status(400).send({ response: "ERROR", message: "Cliente no encontrado" });
+            return;
+        }
+
+        //Suponiendo que el contacto es unico tomamos el primer resultado
+        const cliente = clientes[0];
+        
+        //Se extraen los datos 
+        const paswd   = jsonParser('password', cliente);
+        const activo  = jsonParser('activo', cliente);
+        const nombre  = jsonParser('nombre', cliente);
+        const id      = jsonParser('id', cliente);
+        const fecha_ultimo_ingreso = jsonParser('fecha_ultimo_ingreso', cliente);
+        if (password == paswd) {
+            if (activo == true){
+                res.status(200).send(JSON.stringify({response : "OK", "id" : id, "nombre" : nombre, "contacto" : contacto, "fecha_ultimo_ingreso": fecha_ultimo_ingreso}));
+            }else {
+                res.status(400).send(JSON.stringify({response : "ERROR", message : "Cliente no activo"}));
             }
-        };
-        docClient.get(params, function (err, data) {
-            if (err) {
-                res.status(400).send(JSON.stringify({response : "ERROR", message : "DB access error "+err}));
-            }
-            else {
-                if (Object.keys(data).length == 0) {
-                    res.status(400).send({response : "ERROR" , message : "Cliente invalido"});
-                } else {
-                    const paswd=jsonParser('password',data.Item);
-                    const activo=jsonParser('activo',data.Item);
-                    const id=jsonParser('id',data.Item);
-                    const contacto=jsonParser('contacto',data.Item);
-                    if (password == paswd) {
-                        if (activo == true) {
-                            const nombre=jsonParser('nombre',data.Item);
-                            const fecha_ultimo_ingreso=jsonParser('fecha_ultimo_ingreso',data.Item);
-                            res.status(200).send(JSON.stringify({response : "OK", "id" : id, "nombre" : nombre, "contacto" : contacto, "fecha_ultimo_ingreso": fecha_ultimo_ingreso}));    
-                        } else {
-                            res.status(400).send(JSON.stringify({response : "ERROR", message : "Cliente no activo"}));    
-                        }
-                    } else {
-                       res.status(400).send(JSON.stringify({response : "ERROR" , message : "usuario incorrecto"}));
-                    }    
-            }    
-            }
-        })
+        }else {
+            res.status(400).send(JSON.stringify({response : "ERROR" , message : "usuario incorrecto"}));
+        }
+
+
+    }catch(err){
+        res.status(400).send(JSON.stringify({response : "ERROR", message : "DB access error "+err}));
     }
-    getClienteByKey();
 
 });
 
@@ -194,9 +190,9 @@ async function scanDb(contacto) {
     const paramsScan = { // ScanInput
       TableName: "cliente", // required
       Select: "ALL_ATTRIBUTES" || "ALL_PROJECTED_ATTRIBUTES" || "SPECIFIC_ATTRIBUTES" || "COUNT",
-      FilterExpression : 'id = :contacto',
+      FilterExpression : 'contacto = :contacto',
       ExpressionAttributeValues : {':contacto' : scanKey}
-    };      
+    };    
     var objectPromise = await docClient.scan(paramsScan).promise().then((data) => {
           return data.Items 
     });  
